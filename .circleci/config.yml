@@ -1,0 +1,45 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/golang:1.11.0
+
+    working_directory: /go/src/github.com/bbucko/iec-cli
+
+    environment:
+      TEST_RESULTS: /tmp/test-results
+
+    steps:
+    - checkout
+
+    - run:
+        name: Prepare environment
+        command: mkdir -p $TEST_RESULTS
+
+    - restore_cache:
+        keys:
+        - v1-pkg-cache
+
+    - run:
+        name: Downloading dependencies
+        command: dep ensure
+
+    - run:
+        name: Building project
+        command: go build ./...
+
+    - run:
+        name: Running tests
+        command: gotestsum --junitfile ${TEST_RESULTS}/results.xml
+
+    - save_cache:
+        key: v1-pkg-cache
+        paths:
+        - "/go/pkg"
+
+    - store_artifacts:
+        path: /tmp/test-results
+        destination: raw-test-output
+
+    - store_test_results:
+        path: /tmp/test-results
