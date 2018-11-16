@@ -1,0 +1,7 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/akamai/cli-common-golang"
+
+[prune]
+  go-tests = true
+  unused-packages = true

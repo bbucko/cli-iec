@@ -1,0 +1,20 @@
+{
+  "name": "akamai/cli-iec",
+  "requirements": {
+    "go": "1.10.0"
+  },
+  "commands": [
+    {
+      "name": "iec-generate-keys",
+      "version": "0.0.1",
+      "description": "",
+      "auto-complete": true
+    },
+    {
+      "name": "iec-generate-token",
+      "version": "0.0.1",
+      "description": "",
+      "auto-complete": true
+    }
+  ]
+}
