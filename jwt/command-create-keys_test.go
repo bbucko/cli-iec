@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func TestFetchKeysByName(t *testing.T) {
+func TestFetchRSAKeyByName(t *testing.T) {
 	keyName := "my-keys"
-	keys := tryCreateKeys(t, keyName, 128)
+	keys := tryCreateRSAKey(t, keyName, 128)
 
-	keys.persist()
-	fetchedKeys, er := FetchKeysByName(keyName)
+	keys.Persist()
+	fetchedKeys, er := FetchRSAKeyByName(keyName)
 
 	if er != nil {
 		t.Fatal("Error fetching created key")
@@ -20,45 +20,45 @@ func TestFetchKeysByName(t *testing.T) {
 	}
 }
 
-func TestKeysFormat(t *testing.T) {
-	keys := tryCreateKeys(t, "some-name", 128)
+func TestRSAKeyFormat(t *testing.T) {
+	key := tryCreateRSAKey(t, "some-name", 128)
 
-	if !strings.Contains(keys.Private, "-----BEGIN RSA PRIVATE KEY-----") {
+	if !strings.Contains(key.PrivateKey, "-----BEGIN RSA PRIVATE KEY-----") {
 		t.Fatal("Private key format error")
 	}
-	if !strings.Contains(keys.Private, "-----END RSA PRIVATE KEY-----") {
+	if !strings.Contains(key.PrivateKey, "-----END RSA PRIVATE KEY-----") {
 		t.Fatal("Private key format error")
 	}
-	if !strings.Contains(keys.Public, "-----BEGIN RSA PUBLIC KEY-----") {
+	if !strings.Contains(key.PublicKey, "-----BEGIN RSA PUBLIC KEY-----") {
 		t.Fatal("Public key format error")
 	}
-	if !strings.Contains(keys.Public, "-----END RSA PUBLIC KEY-----") {
+	if !strings.Contains(key.PublicKey, "-----END RSA PUBLIC KEY-----") {
 		t.Fatal("Public key format error")
 	}
 }
 
-func TestKeysPublicKeyName(t *testing.T) {
-	keys := tryCreateKeys(t, "some-name", 128)
-	expectedName := "some-name_pub"
+func TestKeysPublicKeySectionName(t *testing.T) {
+	key := tryCreateRSAKey(t, "some-name", 128)
+	expectedName := "some-name_public"
 
-	if !(keys.publicKeyName() == expectedName) {
-		t.Fatalf("Public key name format error, actual [%v] != expected [%v]", keys.publicKeyName(), expectedName)
+	if !(key.PublicKeySectionName() == expectedName) {
+		t.Fatalf("Public key section name format error, actual [%v] != expected [%v]", key.PublicKeySectionName(), expectedName)
 	}
 }
 
-func TestKeysPrivateKeyName(t *testing.T) {
-	keys := tryCreateKeys(t, "some-name", 128)
-	expectedName := "some-name_prv"
+func TestKeysPrivateKeySectionName(t *testing.T) {
+	key := tryCreateRSAKey(t, "some-name", 128)
+	expectedName := "some-name_private"
 
-	if !(keys.privateKeyName() == expectedName) {
-		t.Fatalf("Private key name format error, actual [%v] != expected [%v]", keys.privateKeyName(), expectedName)
+	if !(key.PrivateKeySectionName() == expectedName) {
+		t.Fatalf("Private key section name format error, actual [%v] != expected [%v]", key.PrivateKeySectionName(), expectedName)
 	}
 }
 
-func tryCreateKeys(t *testing.T, name string, bits int) Keys {
-	keys, er := createKeys(name, bits)
+func tryCreateRSAKey(t *testing.T, name string, bits int) RSAKey {
+	key, er := CreateRSAKey(name, bits)
 	if er != nil {
 		t.Fatal("Error creating key")
 	}
-	return keys
+	return key
 }

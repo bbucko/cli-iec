@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"github.com/bbucko/cli-iec/jwt"
 	"github.com/go-ini/ini"
 	"github.com/mitchellh/go-homedir"
 	"github.com/urfave/cli"
@@ -95,28 +96,18 @@ func saveFile(cfg *ini.File) (err error) {
 	return nil
 }
 
-type RSAKey struct {
-	publicKey  string
-	privateKey string
-	keyName    string
-}
-
-func NewRSAKey(keyName string, section *ini.Section) (key *RSAKey) {
-	key = new(RSAKey)
-	key.keyName = keyName
-	key.publicKey = section.Key(key.configKey("public")).String()
-	key.privateKey = section.Key(key.configKey("private")).String()
+func NewRSAKey(keyName string, section *ini.Section) (key *jwt.RSAKey) {
+	key = new(jwt.RSAKey)
+	key.KeyName = keyName
+	key.PublicKey = section.Key(key.PublicKeySectionName()).String()
+	key.PrivateKey = section.Key(key.PrivateKeySectionName()).String()
 	return key
-}
-
-func (k *RSAKey) configKey(key string) string {
-	return fmt.Sprint(k.keyName, "_", key)
 }
 
 type Configuration struct {
 	namespace    string
 	jurisdiction string
-	key          *RSAKey
+	key          *jwt.RSAKey
 }
 
 func NewConfiguration(namespace string, jurisdiction string) (config *Configuration) {
