@@ -25,17 +25,23 @@ func OpenConfig(c *cli.Context, namespace string, jurisdiction string) (config *
 		return
 	}
 
+	err = ensureSection(cfg, "keys")
+	if err != nil {
+		return
+	}
+
 	err = saveFile(cfg)
 	if err != nil {
 		return
 	}
 
 	iecSection := cfg.Section("iec")
-	jwtSection := cfg.Section("jwt")
+	_ = cfg.Section("jwt")
+	keysSection := cfg.Section("keys")
 
 	config = NewConfiguration(namespace, jurisdiction)
 	keyName := iecSection.Key(config.configKey("jwtKeyName")).MustString("default")
-	config.key = NewRSAKey(keyName, jwtSection)
+	config.key = NewRSAKey(keyName, keysSection)
 	return
 }
 
