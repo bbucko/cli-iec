@@ -67,4 +67,8 @@ func TestReadingEmptyConfigFile(t *testing.T) {
 	if cfg.Section("jwt") == nil {
 		t.Fatal("missing section: ", "jwt")
 	}
+
+	if cfg.Section("keys") == nil {
+		t.Fatal("missing section: ", "keys")
+	}
 }
