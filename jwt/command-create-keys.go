@@ -1,6 +1,7 @@
-package jwt
+package main
 
 import (
+	"github.com/bbucko/cli-iec/keys"
 	"github.com/urfave/cli"
 	"log"
 )
@@ -21,15 +22,15 @@ func callCreateKeys(c *cli.Context) error {
 	name := c.String("name")
 	bits := c.Int("bits")
 
-	keys, er := CreateRSAKey(name, bits)
+	key, er := keys.CreateRSAKey(name, bits)
 	if er != nil {
 		log.Fatal("Creating keys failed for ")
 		return er
 	}
 
-	log.Printf("%s", keys.PrivateKey)
-	log.Printf("%s", keys.PublicKey)
+	log.Printf("%s", key.PrivateKey)
+	log.Printf("%s", key.PublicKey)
 
-	keys.Persist()
+	key.Persist()
 	return nil
 }

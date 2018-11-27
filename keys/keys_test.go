@@ -1,4 +1,4 @@
-package jwt
+package keys
 
 import (
 	"strings"
@@ -6,17 +6,17 @@ import (
 )
 
 func TestFetchRSAKeyByName(t *testing.T) {
-	keyName := "my-keys"
-	keys := tryCreateRSAKey(t, keyName, 128)
+	keyName := "my-key"
+	key := tryCreateRSAKey(t, keyName, 128)
 
-	keys.Persist()
+	key.Persist()
 	fetchedKeys, er := FetchRSAKeyByName(keyName)
 
 	if er != nil {
 		t.Fatal("Error fetching created key")
 	}
-	if keys != fetchedKeys {
-		t.Fatal("Created keys is different than persisted")
+	if key != fetchedKeys {
+		t.Fatal("Created key is different than persisted")
 	}
 }
 
