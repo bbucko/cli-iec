@@ -1,5 +1,7 @@
 [iec]
-ns_js_jwtKeyName = abc
+ns_js_jwtKeyName = key1
 
 [jwt]
+key1_public  = abc
+key1_private = def
 
