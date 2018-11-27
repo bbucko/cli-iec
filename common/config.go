@@ -88,14 +88,14 @@ func saveFile(cfg *ini.File) (err error) {
 type Configuration struct {
 	namespace    string
 	jurisdiction string
-	keyName      string
+	KeyName      string
 }
 
 func NewConfiguration(namespace string, jurisdiction string, section *ini.Section) (config *Configuration) {
 	config = new(Configuration)
 	config.namespace = namespace
 	config.jurisdiction = jurisdiction
-	config.keyName = section.Key(config.key("jwtKeyName")).String()
+	config.KeyName = section.Key(config.key("jwtKeyName")).String()
 	return config
 }
 
