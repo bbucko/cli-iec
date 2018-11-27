@@ -25,16 +25,16 @@ func TestReadingFilledConfigFile(t *testing.T) {
 		t.Fatal("jurisdiction:", config.jurisdiction, "does not match", "js")
 	}
 
-	if config.key.keyName != "key1" {
-		t.Fatal("key name:", config.key.keyName, "does not match", "key1")
+	if config.key.KeyName != "key1" {
+		t.Fatal("key name:", config.key.KeyName, "does not match", "key1")
 	}
 
-	if config.key.publicKey != "abc" {
-		t.Fatal("public key name:", config.key.publicKey, "does not match", "abc")
+	if config.key.PublicKey != "abc" {
+		t.Fatal("public key name:", config.key.PublicKey, "does not match", "abc")
 	}
 
-	if config.key.privateKey != "def" {
-		t.Fatal("private key name:", config.key.privateKey, "does not match", "def")
+	if config.key.PrivateKey != "def" {
+		t.Fatal("private key name:", config.key.PrivateKey, "does not match", "def")
 	}
 }
 
@@ -55,8 +55,8 @@ func TestReadingEmptyConfigFile(t *testing.T) {
 		t.Fatal("jurisdiction:", config.jurisdiction, "does not match", "js")
 	}
 
-	if config.key.keyName != "default" {
-		t.Fatal("default public key:", config.key.keyName, "does not match", "default")
+	if config.key.KeyName != "default" {
+		t.Fatal("default public key:", config.key.KeyName, "does not match", "default")
 	}
 
 	cfg, _ := ini.Load(configFile)
