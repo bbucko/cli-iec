@@ -24,6 +24,18 @@ func TestReadingFilledConfigFile(t *testing.T) {
 	if config.jurisdiction != "js" {
 		t.Fatal("jurisdiction:", config.jurisdiction, "does not match", "js")
 	}
+
+	if config.key.keyName != "key1" {
+		t.Fatal("key name:", config.key.keyName, "does not match", "key1")
+	}
+
+	if config.key.publicKey != "abc" {
+		t.Fatal("public key name:", config.key.publicKey, "does not match", "abc")
+	}
+
+	if config.key.privateKey != "def" {
+		t.Fatal("private key name:", config.key.privateKey, "does not match", "def")
+	}
 }
 
 func TestReadingEmptyConfigFile(t *testing.T) {
@@ -43,6 +55,10 @@ func TestReadingEmptyConfigFile(t *testing.T) {
 		t.Fatal("jurisdiction:", config.jurisdiction, "does not match", "js")
 	}
 
+	if config.key.keyName != "default" {
+		t.Fatal("default public key:", config.key.keyName, "does not match", "default")
+	}
+
 	cfg, _ := ini.Load(configFile)
 	if cfg.Section("iec") == nil {
 		t.Fatal("missing section: ", "iec")
@@ -50,5 +66,9 @@ func TestReadingEmptyConfigFile(t *testing.T) {
 
 	if cfg.Section("jwt") == nil {
 		t.Fatal("missing section: ", "jwt")
+	}
+
+	if cfg.Section("keys") == nil {
+		t.Fatal("missing section: ", "keys")
 	}
 }

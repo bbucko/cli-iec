@@ -25,13 +25,23 @@ func OpenConfig(c *cli.Context, namespace string, jurisdiction string) (config *
 		return
 	}
 
+	err = ensureSection(cfg, "keys")
+	if err != nil {
+		return
+	}
+
 	err = saveFile(cfg)
 	if err != nil {
 		return
 	}
 
-	config = NewConfiguration(namespace, jurisdiction, cfg.Section("iec"))
+	iecSection := cfg.Section("iec")
+	_ = cfg.Section("jwt")
+	keysSection := cfg.Section("keys")
 
+	config = NewConfiguration(namespace, jurisdiction)
+	keyName := iecSection.Key(config.configKey("jwtKeyName")).MustString("default")
+	config.key = NewRSAKey(keyName, keysSection)
 	return
 }
 
@@ -85,17 +95,34 @@ func saveFile(cfg *ini.File) (err error) {
 	return nil
 }
 
+type RSAKey struct {
+	publicKey  string
+	privateKey string
+	keyName    string
+}
+
+func NewRSAKey(keyName string, section *ini.Section) (key *RSAKey) {
+	key = new(RSAKey)
+	key.keyName = keyName
+	key.publicKey = section.Key(key.configKey("public")).String()
+	key.privateKey = section.Key(key.configKey("private")).String()
+	return key
+}
+
+func (k *RSAKey) configKey(key string) string {
+	return fmt.Sprint(k.keyName, "_", key)
+}
+
 type Configuration struct {
 	namespace    string
 	jurisdiction string
-	KeyName      string
+	key          *RSAKey
 }
 
-func NewConfiguration(namespace string, jurisdiction string, section *ini.Section) (config *Configuration) {
+func NewConfiguration(namespace string, jurisdiction string) (config *Configuration) {
 	config = new(Configuration)
 	config.namespace = namespace
 	config.jurisdiction = jurisdiction
-	config.KeyName = section.Key(config.key("jwtKeyName")).String()
 	return config
 }
 
@@ -103,6 +130,6 @@ func (c *Configuration) UpdateSection(section *ini.Section) {
 
 }
 
-func (c *Configuration) key(key string) string {
+func (c *Configuration) configKey(key string) string {
 	return fmt.Sprint(c.namespace, "_", c.jurisdiction, "_", key)
 }
