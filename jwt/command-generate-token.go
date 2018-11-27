@@ -5,9 +5,9 @@ import (
 )
 
 var commandGenerateToken = cli.Command{
-	Name:        "generate-token",
+	Name:        "token",
 	ArgsUsage:   "",
-	Description: "Generate token",
+	Description: "",
 	HideHelp:    true,
 	Action:      callGenerateToken,
 	Flags:       []cli.Flag{},

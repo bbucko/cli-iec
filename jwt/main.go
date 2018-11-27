@@ -21,6 +21,8 @@ var commandLocator akamai.CommandLocator = func() ([]cli.Command, error) {
 			Action:       akamai.CmdHelp,
 			BashComplete: akamai.DefaultAutoComplete,
 		},
+		commandCreateKeys,
+		commandGenerateToken,
 	}
 
 	return commands, nil
@@ -28,7 +30,7 @@ var commandLocator akamai.CommandLocator = func() ([]cli.Command, error) {
 
 func main() {
 	akamai.CreateApp(
-		"iec-connect",
+		"jwt",
 		"",
 		"",
 		"0.0.1",

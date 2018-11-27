@@ -5,19 +5,13 @@
   },
   "commands": [
     {
-      "name": "iec-crypto",
+      "name": "jwt",
       "version": "0.0.1",
       "description": "",
       "auto-complete": true
     },
     {
-      "name": "iec-connect",
-      "version": "0.0.1",
-      "description": "",
-      "auto-complete": true
-    },
-    {
-      "name": "iec-config",
+      "name": "iec",
       "version": "0.0.1",
       "description": "",
       "auto-complete": true
