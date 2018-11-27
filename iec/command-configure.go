@@ -25,5 +25,11 @@ func callConfigure(c *cli.Context) error {
 
 	log.Print("Config: ", config)
 
+	err = common.SaveConfig(c, config)
+	if err != nil {
+		log.Fatal("Error encountered during saving of configuration: ", err)
+		return err
+	}
+
 	return nil
 }

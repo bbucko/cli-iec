@@ -5,13 +5,56 @@ import (
 	"github.com/go-ini/ini"
 	"github.com/mitchellh/go-homedir"
 	"github.com/urfave/cli"
-	"log"
 	"os"
 	"path/filepath"
 )
 
-type Configuration struct {
-	keyName string
+func OpenConfig(c *cli.Context, namespace string, jurisdiction string) (config *Configuration, err error) {
+	cfg, err := openFile()
+	if err != nil {
+		return
+	}
+
+	err = ensureSection(cfg, "iec")
+	if err != nil {
+		return
+	}
+
+	err = ensureSection(cfg, "jwt")
+	if err != nil {
+		return
+	}
+
+	err = saveFile(cfg)
+	if err != nil {
+		return
+	}
+
+	config = NewConfiguration(namespace, jurisdiction, cfg.Section("iec"))
+
+	return
+}
+
+func SaveConfig(c *cli.Context, configuration *Configuration) (err error) {
+	cfg, err := openFile()
+	if err != nil {
+		return
+	}
+
+	section := cfg.Section("iec")
+	configuration.UpdateSection(section)
+	return nil
+}
+
+func ensureSection(cfg *ini.File, sectionName string) (err error) {
+	section := cfg.Section(sectionName)
+	if section == nil {
+		section, err = cfg.NewSection("iec")
+		if err != nil {
+			return
+		}
+	}
+	return nil
 }
 
 func cliConfigPath() (configPath string) {
@@ -26,7 +69,6 @@ func cliConfigPath() (configPath string) {
 
 func openFile() (configFile *ini.File, err error) {
 	configPath := cliConfigPath()
-	log.Print("Loading INI file from: ", configPath)
 	configFile, err = ini.Load(configPath)
 	if err != nil {
 		return
@@ -43,28 +85,24 @@ func saveFile(cfg *ini.File) (err error) {
 	return nil
 }
 
-func OpenConfig(c *cli.Context, namespace string, jurisdiction string) (config *Configuration, err error) {
-	cfg, err := openFile()
-	if err != nil {
-		return
-	}
+type Configuration struct {
+	namespace    string
+	jurisdiction string
+	keyName      string
+}
 
-	section := cfg.Section("iec")
-	if section == nil {
-		section, err = cfg.NewSection("iec")
-	}
-
-	if err != nil {
-		return
-	}
-
-	err = saveFile(cfg)
-	if err != nil {
-		return
-	}
-
+func NewConfiguration(namespace string, jurisdiction string, section *ini.Section) (config *Configuration) {
 	config = new(Configuration)
-	config.keyName = section.Key(fmt.Sprint(namespace, "_", jurisdiction, "_", "key")).String()
+	config.namespace = namespace
+	config.jurisdiction = jurisdiction
+	config.keyName = section.Key(config.key("jwtKeyName")).String()
+	return config
+}
 
-	return
+func (c *Configuration) UpdateSection(section *ini.Section) {
+
+}
+
+func (c *Configuration) key(key string) string {
+	return fmt.Sprint(c.namespace, "_", c.jurisdiction, "_", key)
 }
