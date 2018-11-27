@@ -1,5 +1,5 @@
 {
-  "name": "akamai/cli-iec",
+  "name": "bbucko/cli-iec",
   "requirements": {
     "go": "1.10.0"
   },
