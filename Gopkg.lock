@@ -119,6 +119,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/akamai/cli-common-golang"]
+  input-imports = [
+    "github.com/akamai/cli-common-golang",
+    "github.com/urfave/cli",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

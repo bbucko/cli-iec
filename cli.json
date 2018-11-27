@@ -5,13 +5,19 @@
   },
   "commands": [
     {
-      "name": "iec-generate-keys",
+      "name": "iec-crypto",
       "version": "0.0.1",
       "description": "",
       "auto-complete": true
     },
     {
-      "name": "iec-generate-token",
+      "name": "iec-connect",
+      "version": "0.0.1",
+      "description": "",
+      "auto-complete": true
+    },
+    {
+      "name": "iec-config",
       "version": "0.0.1",
       "description": "",
       "auto-complete": true

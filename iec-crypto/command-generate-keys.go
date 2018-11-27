@@ -5,7 +5,7 @@ import (
 )
 
 var commandGenerateKeys = cli.Command{
-	Name:        "iec-generate-keys",
+	Name:        "generate-keys",
 	ArgsUsage:   "",
 	Description: "Generate keys",
 	HideHelp:    true,

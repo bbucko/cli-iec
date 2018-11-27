@@ -5,7 +5,7 @@ import (
 )
 
 var commandGenerateToken = cli.Command{
-	Name:        "iec-generate-token",
+	Name:        "generate-token",
 	ArgsUsage:   "",
 	Description: "Generate token",
 	HideHelp:    true,

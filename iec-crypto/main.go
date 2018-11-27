@@ -30,7 +30,7 @@ var commandLocator akamai.CommandLocator = func() ([]cli.Command, error) {
 
 func main() {
 	akamai.CreateApp(
-		"iec-auth",
+		"iec-crypto",
 		"",
 		"",
 		"0.0.1",
