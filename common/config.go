@@ -1,13 +1,13 @@
 package common
 
 import (
-	"fmt"
-	"github.com/bbucko/cli-iec/keys"
+	"github.com/bbucko/cli-iec/common/keys"
 	"github.com/go-ini/ini"
 	"github.com/mitchellh/go-homedir"
 	"github.com/urfave/cli"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func OpenConfig(c *cli.Context, namespace string, jurisdiction string) (config *Configuration, err error) {
@@ -37,12 +37,14 @@ func OpenConfig(c *cli.Context, namespace string, jurisdiction string) (config *
 	}
 
 	iecSection := cfg.Section("iec")
-	_ = cfg.Section("jwt")
+	jwtSection := cfg.Section("jwt")
 	keysSection := cfg.Section("keys")
 
-	config = NewConfiguration(namespace, jurisdiction)
-	keyName := iecSection.Key(config.configKey("jwtKeyName")).MustString("default")
-	config.key = NewRSAKey(keyName, keysSection)
+	jwtConfigName := iecSection.Key(configurationKey(namespace, jurisdiction, "jwtConfig")).MustString("default")
+	keyName := jwtSection.Key(namedKey(jwtConfigName, "keyName")).MustString("default")
+	key := NewRSAKey(keyName, keysSection)
+
+	config = NewConfigurationWithRSAKey(namespace, jurisdiction, key)
 	return
 }
 
@@ -105,15 +107,29 @@ func NewRSAKey(keyName string, section *ini.Section) (key *keys.RSAKey) {
 }
 
 type Configuration struct {
-	namespace    string
-	jurisdiction string
-	key          *keys.RSAKey
+	Namespace    string
+	Jurisdiction string
+	JwtConfig    JWTAuth
 }
 
-func NewConfiguration(namespace string, jurisdiction string) (config *Configuration) {
+type JWTAuth struct {
+	key *keys.RSAKey
+}
+
+func (config *JWTAuth) Key() *keys.RSAKey {
+	return config.key
+}
+
+func (config *JWTAuth) ChangeKey(key *keys.RSAKey) error {
+	config.key = key
+	return nil
+}
+
+func NewConfigurationWithRSAKey(namespace string, jurisdiction string, key *keys.RSAKey) (config *Configuration) {
 	config = new(Configuration)
-	config.namespace = namespace
-	config.jurisdiction = jurisdiction
+	config.Namespace = namespace
+	config.Jurisdiction = jurisdiction
+	config.JwtConfig = JWTAuth{key: key}
 	return config
 }
 
@@ -121,6 +137,10 @@ func (c *Configuration) UpdateSection(section *ini.Section) {
 
 }
 
-func (c *Configuration) configKey(key string) string {
-	return fmt.Sprint(c.namespace, "_", c.jurisdiction, "_", key)
+func configurationKey(namespace string, jurisdiction, key string) string {
+	return strings.Join([]string{namespace, jurisdiction, key}, "_")
+}
+
+func namedKey(name string, key string) string {
+	return strings.Join([]string{name, key}, "_")
 }
