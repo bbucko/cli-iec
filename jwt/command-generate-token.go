@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/bbucko/cli-iec/.vendor-new/github.com/dgrijalva/jwt-go"
 	"github.com/bbucko/cli-iec/common"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/urfave/cli"
@@ -15,7 +14,7 @@ var commandGenerateToken cli.Command = cli.Command{
 	Description: "",
 	HideHelp:    true,
 	Action:      callGenerateToken,
-	Flags:       []cli.Flag{
+	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:        "name",
 			Usage:       "Namespace name",
