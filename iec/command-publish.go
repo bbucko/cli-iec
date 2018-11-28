@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	akamai "github.com/akamai/cli-common-golang"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/urfave/cli"
 	"log"
@@ -56,6 +58,7 @@ func callPublish(context *cli.Context) error {
 }
 
 func connectAndPublish(mqttParams MqttParameters, topicName string, message string) error {
+	akamai.StartSpinner("Connecting to: "+mqttParams.host, "Done")
 
 	client, error := mqttParams.connectSSLClient()
 	if error != nil {
@@ -63,15 +66,17 @@ func connectAndPublish(mqttParams MqttParameters, topicName string, message stri
 		return error
 	}
 
-	log.Println("Publisher successfully connected to server:", mqttParams.host)
+	akamai.StopSpinnerOk()
+
+	akamai.StartSpinner(fmt.Sprint("Publishing message '", message, "' with QOS: ", mqttParams.qos, " to topic: ", topicName), "Done")
 
 	error = publishMessage(client, mqttParams, topicName, message)
 	if error != nil {
 		log.Fatalln("Unable to publish message, caused by:", error)
 		return error
 	}
-
-	log.Printf("Message '%s' sent to topic '%s' with qos: %d.\n", message, topicName, mqttParams.qos)
+	akamai.StopSpinnerOk()
+	//log.Printf("Message '%s' sent to topic '%s' with qos: %d.\n", message, topicName, mqttParams.qos)
 
 	return nil
 }
