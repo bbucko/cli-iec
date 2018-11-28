@@ -2,7 +2,6 @@ package main
 
 import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"fmt"
 )
 
 type MqttParameters struct {
