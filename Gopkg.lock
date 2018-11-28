@@ -19,15 +19,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d44078e48cd1aba0dbffda6d1c0a2e291a01b923b68c60e31d8ea378915a9b5c"
+  digest = "1:53110be0e7e865dc1e104babbf2c731e5397bd5f8951a3e2b89820c44211d578"
   name = "github.com/bbucko/cli-iec"
   packages = [
     "common",
+    "common/ini-repo",
     "common/keys",
-    "ini-repo",
   ]
   pruneopts = "UT"
-  revision = "4318f90899914ab18b1ff9f7a08a8a56a6de1a3c"
+  revision = "90f65b5e59c2a0aadc66c3a2ed3f5d246975b81a"
 
 [[projects]]
   digest = "1:2fd83c8c2b1ff53fd7c4376a63c3a2f31e002e9296df9d7f150b07da524de88d"
@@ -165,8 +165,8 @@
   input-imports = [
     "github.com/akamai/cli-common-golang",
     "github.com/bbucko/cli-iec/common",
+    "github.com/bbucko/cli-iec/common/ini-repo",
     "github.com/bbucko/cli-iec/common/keys",
-    "github.com/bbucko/cli-iec/ini-repo",
     "github.com/dgrijalva/jwt-go",
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/go-ini/ini",
