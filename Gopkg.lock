@@ -34,6 +34,17 @@
   version = "v3.2.0"
 
 [[projects]]
+  digest = "1:184008c955d6a3226b700c13ed0e875a7a051a759618f9bccba9b5c99f17faa5"
+  name = "github.com/eclipse/paho.mqtt.golang"
+  packages = [
+    ".",
+    "packets",
+  ]
+  pruneopts = "UT"
+  revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:865079840386857c809b72ce300be7580cb50d3d3129ce11bf9aa6ca2bc1934a"
   name = "github.com/fatih/color"
   packages = ["."]
@@ -115,6 +126,18 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:50095e42352dba1c6ab2cec7e03b24fb4b513123f41d4ab4dbd2627c25fe18b8"
+  name = "golang.org/x/net"
+  packages = [
+    "internal/socks",
+    "proxy",
+    "websocket",
+  ]
+  pruneopts = "UT"
+  revision = "adae6a3d119ae4890b46832a2e88a95adc62b8e7"
+
+[[projects]]
+  branch = "master"
   digest = "1:f343f077a5b0bc3a3788b3a04e24dd417e3e25b2acb529c413e212d2c42416ef"
   name = "golang.org/x/sys"
   packages = [
@@ -130,7 +153,9 @@
   input-imports = [
     "github.com/akamai/cli-common-golang",
     "github.com/dgrijalva/jwt-go",
+    "github.com/eclipse/paho.mqtt.golang",
     "github.com/go-ini/ini",
+    "github.com/google/uuid",
     "github.com/mitchellh/go-homedir",
     "github.com/urfave/cli",
   ]

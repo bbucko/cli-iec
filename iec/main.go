@@ -1,10 +1,9 @@
 package main
 
 import (
+	akamai "github.com/akamai/cli-common-golang"
 	"github.com/urfave/cli"
 	"os"
-
-	akamai "github.com/akamai/cli-common-golang"
 )
 
 var commandLocator akamai.CommandLocator = func() ([]cli.Command, error) {

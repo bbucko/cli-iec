@@ -1,9 +1,12 @@
 [iec]
-ns_js_jwtKeyName = key1
+ns_js_jwtConfig = jwt1
 
 [keys]
 key1_public  = abc
 key1_private = def
 
 [jwt]
+jwt1_keyName        = key1
+jwt1_clientIdClaim  = clientId
+jwt1_authGroupClaim = authGroup
 
