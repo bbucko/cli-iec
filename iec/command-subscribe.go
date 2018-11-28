@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	akamai "github.com/akamai/cli-common-golang"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/urfave/cli"
 	"log"
@@ -52,21 +53,26 @@ func callSubscribe(context *cli.Context) error {
 }
 
 func connectAndSubscribe(mqttParams MqttParameters, topicName string) error {
+	akamai.StartSpinner("Connecting to: "+mqttParams.host, "Connected")
+
 	client, error := mqttParams.connectSSLClient()
 	if error != nil {
 		log.Fatalln("Unable to publish message, caused by connection error:", error)
+		akamai.StopSpinnerFail()
 		return error
 	}
 
-	log.Println("Subscriber successfully connected to server:", mqttParams.host)
+	akamai.StopSpinnerOk()
 
+	akamai.StartSpinner("Subscribing to topic: "+topicName, "Subscribed")
 	error = subscribeToTopic(client, mqttParams, topicName)
 	if error != nil {
 		log.Fatalf("Unable to subscribe topic '%s', caused by: %s\n", topicName, error)
+		akamai.StopSpinnerFail()
 		return error
 	}
 
-	log.Printf("Successfully subscribed to a topic: '%s'.\n", topicName)
+	akamai.StopSpinnerOk()
 
 	waitForQuit()
 
