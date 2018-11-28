@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"log"
 	"fmt"
+	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/urfave/cli"
+	"log"
 )
 
 var commandSubscribe = cli.Command{
@@ -13,28 +13,28 @@ var commandSubscribe = cli.Command{
 	Description: "Subscribes to a topic and waits for a messages published to this topic.",
 	HideHelp:    true,
 	Action:      callSubscribe,
-	Flags:       []cli.Flag{
-		cli.IntFlag {
-			Name: "qos",
+	Flags: []cli.Flag{
+		cli.IntFlag{
+			Name:  "qos",
 			Usage: "qos - Quality of service. Allowed values 0, 1, 2.",
 			Value: 0,
 		},
-		cli.StringFlag {
-			Name: "host",
+		cli.StringFlag{
+			Name:  "host",
 			Usage: "Url to host",
 			Value: "qa4.dcp-test.com",
 		},
-		cli.StringFlag {
-			Name: "client-id",
+		cli.StringFlag{
+			Name:  "client-id",
 			Usage: "Client id",
 			Value: "WebSocketSub",
 		},
-		cli.StringFlag {
-			Name: "key-name",
+		cli.StringFlag{
+			Name:  "key-name",
 			Usage: "Name of the generated key",
 		},
-		cli.StringFlag {
-			Name: "topic",
+		cli.StringFlag{
+			Name:  "topic",
 			Usage: "Name of the topic to which message will be published",
 			Value: "test",
 		},
@@ -94,6 +94,3 @@ func waitForQuit() {
 	}
 	fmt.Println("Bye!")
 }
-
-
-

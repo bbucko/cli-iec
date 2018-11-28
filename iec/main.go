@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/urfave/cli"
 	akamai "github.com/akamai/cli-common-golang"
+	"github.com/urfave/cli"
 	"os"
 )
 

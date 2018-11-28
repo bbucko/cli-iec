@@ -1,48 +1,48 @@
 package main
 
 import (
-	"github.com/urfave/cli"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/urfave/cli"
 	"log"
 )
 
-var commandPublish = cli.Command {
+var commandPublish = cli.Command{
 	Name:        "publish",
 	ArgsUsage:   "[qos][host][client-id][key-name][topic][message]",
 	Description: "Publishes message to the topic",
 	HideHelp:    true,
 	Action:      callPublish,
-	Flags:       []cli.Flag {
-		cli.IntFlag {
-			Name: "qos",
+	Flags: []cli.Flag{
+		cli.IntFlag{
+			Name:  "qos",
 			Usage: "qos - Quality of service. Allowed values 0, 1, 2.",
 			Value: 0,
 		},
-		cli.StringFlag {
-			Name: "host",
+		cli.StringFlag{
+			Name:  "host",
 			Usage: "Url to host",
 			Value: "qa4.dcp-test.com",
-        },
-		cli.StringFlag {
-			Name: "client-id",
+		},
+		cli.StringFlag{
+			Name:  "client-id",
 			Usage: "Client id",
 			Value: "WebSocketPub",
-        },
-		cli.StringFlag {
-			Name: "key-name",
+		},
+		cli.StringFlag{
+			Name:  "key-name",
 			Usage: "Name of the generated key",
-        },
-		cli.StringFlag {
-			Name: "topic",
+		},
+		cli.StringFlag{
+			Name:  "topic",
 			Usage: "Name of the topic to which message will be published",
 			Value: "test",
-        },
-		cli.StringFlag {
-			Name: "message",
+		},
+		cli.StringFlag{
+			Name:  "message",
 			Usage: "Message to be published",
 			Value: "Hello Akamai",
-        },
-    },
+		},
+	},
 }
 
 func callPublish(context *cli.Context) error {
