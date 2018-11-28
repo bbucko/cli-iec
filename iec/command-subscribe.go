@@ -86,7 +86,8 @@ func subscribeToTopic(client MQTT.Client, mqttParams MqttParameters, topicName s
 }
 
 func onMessage(client MQTT.Client, message MQTT.Message) {
-	log.Printf("Message '%s' received.\n", string(message.Payload()))
+	akamai.StartSpinner(fmt.Sprintf("Message '%s' received", string(message.Payload())), "Done")
+	akamai.StopSpinnerOk()
 }
 
 func waitForQuit() {
