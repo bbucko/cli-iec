@@ -59,8 +59,6 @@ func callConfigure(c *cli.Context) error {
 		return err
 	}
 
-	log.Print("Current configuration: ", config)
-
 	dummyOperation("Uploading keys to JWT")
 	dummyOperation("Configuring new Property")
 	dummyOperation("Activating Property")

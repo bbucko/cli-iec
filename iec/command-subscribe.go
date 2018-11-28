@@ -4,6 +4,7 @@ import (
 	"fmt"
 	akamai "github.com/akamai/cli-common-golang"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/fatih/color"
 	"github.com/urfave/cli"
 	"log"
 )
@@ -55,21 +56,21 @@ func callSubscribe(context *cli.Context) error {
 func connectAndSubscribe(mqttParams MqttParameters, topicName string) error {
 	akamai.StartSpinner("Connecting to: "+mqttParams.host, "Connected")
 
-	client, error := mqttParams.connectSSLClient()
-	if error != nil {
-		log.Fatalln("Unable to publish message, caused by connection error:", error)
+	client, err := mqttParams.connectSSLClient()
+	if err != nil {
+		log.Fatalln("Unable to publish message, caused by connection err:", err)
 		akamai.StopSpinnerFail()
-		return error
+		return err
 	}
 
 	akamai.StopSpinnerOk()
 
 	akamai.StartSpinner("Subscribing to topic: "+topicName, "Subscribed")
-	error = subscribeToTopic(client, mqttParams, topicName)
-	if error != nil {
-		log.Fatalf("Unable to subscribe topic '%s', caused by: %s\n", topicName, error)
+	err = subscribeToTopic(client, mqttParams, topicName)
+	if err != nil {
+		log.Fatalf("Unable to subscribe topic '%s', caused by: %s\n", topicName, err)
 		akamai.StopSpinnerFail()
-		return error
+		return err
 	}
 
 	akamai.StopSpinnerOk()
@@ -86,8 +87,7 @@ func subscribeToTopic(client MQTT.Client, mqttParams MqttParameters, topicName s
 }
 
 func onMessage(client MQTT.Client, message MQTT.Message) {
-	akamai.StartSpinner(fmt.Sprintf("Message '%s' received", string(message.Payload())), "Done")
-	akamai.StopSpinnerOk()
+	log.Printf("Message '%s' received\n", color.GreenString(string(message.Payload())))
 }
 
 func waitForQuit() {
