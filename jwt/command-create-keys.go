@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bbucko/cli-iec/keys"
+	"github.com/bbucko/cli-iec/common/keys"
 	"github.com/urfave/cli"
 	"log"
 )
