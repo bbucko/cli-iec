@@ -17,24 +17,24 @@ func TestReadingFilledConfigFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if config.namespace != "ns" {
-		t.Fatal("namespace:", config.namespace, "does not match", "ns")
+	if config.Namespace != "ns" {
+		t.Fatal("Namespace:", config.Namespace, "does not match", "ns")
 	}
 
-	if config.jurisdiction != "js" {
-		t.Fatal("jurisdiction:", config.jurisdiction, "does not match", "js")
+	if config.Jurisdiction != "js" {
+		t.Fatal("Jurisdiction:", config.Jurisdiction, "does not match", "js")
 	}
 
-	if config.key.KeyName != "key1" {
-		t.Fatal("key name:", config.key.KeyName, "does not match", "key1")
+	if config.JwtConfig.Key().KeyName != "key1" {
+		t.Fatal("Key name:", config.JwtConfig.Key().KeyName, "does not match", "key1")
 	}
 
-	if config.key.PublicKey != "abc" {
-		t.Fatal("public key name:", config.key.PublicKey, "does not match", "abc")
+	if config.JwtConfig.Key().PublicKey != "abc" {
+		t.Fatal("public Key name:", config.JwtConfig.Key().PublicKey, "does not match", "abc")
 	}
 
-	if config.key.PrivateKey != "def" {
-		t.Fatal("private key name:", config.key.PrivateKey, "does not match", "def")
+	if config.JwtConfig.Key().PrivateKey != "def" {
+		t.Fatal("private Key name:", config.JwtConfig.Key().PrivateKey, "does not match", "def")
 	}
 }
 
@@ -47,16 +47,16 @@ func TestReadingEmptyConfigFile(t *testing.T) {
 
 	config, _ := OpenConfig(nil, "ns", "js")
 
-	if config.namespace != "ns" {
-		t.Fatal("namespace:", config.namespace, "does not match", "ns")
+	if config.Namespace != "ns" {
+		t.Fatal("Namespace:", config.Namespace, "does not match", "ns")
 	}
 
-	if config.jurisdiction != "js" {
-		t.Fatal("jurisdiction:", config.jurisdiction, "does not match", "js")
+	if config.Jurisdiction != "js" {
+		t.Fatal("Jurisdiction:", config.Jurisdiction, "does not match", "js")
 	}
 
-	if config.key.KeyName != "default" {
-		t.Fatal("default public key:", config.key.KeyName, "does not match", "default")
+	if config.JwtConfig.Key().KeyName != "default" {
+		t.Fatal("default public Key:", config.JwtConfig.Key().KeyName, "does not match", "default")
 	}
 
 	cfg, _ := ini.Load(configFile)

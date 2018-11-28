@@ -1,25 +1,31 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"github.com/bbucko/cli-iec/common"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/urfave/cli"
+	"github.com/bbucko/cli-iec/common/jwtoken"
 )
 
-var commandGenerateToken cli.Command = cli.Command{
+var commandGenerateToken = cli.Command{
 	Name:        "token",
-	ArgsUsage:   "[name] [jurisdiction]",
+	ArgsUsage:   "[name] [jurisdiction] [clientId] [clientIdClaim] [authGroups] [authGroupsClaim]",
 	Description: "",
 	HideHelp:    true,
 	Action:      callGenerateToken,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:        "name",
+			Name:        "namespace",
 			Usage:       "Namespace name",
 			EnvVar:      "",
 			Hidden:      false,
+			Value:       "",
+			Destination: nil,
+		},
+		cli.StringFlag{
+			Name:        "name",
+			Usage:       "Key name",
+			EnvVar:      "",
+			Hidden:      true,
 			Value:       "",
 			Destination: nil,
 		},
@@ -44,7 +50,7 @@ var commandGenerateToken cli.Command = cli.Command{
 			Usage:       "Client id claim",
 			EnvVar:      "",
 			Hidden:      true,
-			Value:       "client-id",
+			Value:       "clientId",
 			Destination: nil,
 		},
 		cli.StringFlag{
@@ -60,37 +66,25 @@ var commandGenerateToken cli.Command = cli.Command{
 			Usage:       "Auth groups claim",
 			EnvVar:      "",
 			Hidden:      true,
-			Value:       "auth-groups",
+			Value:       "authGroups",
 			Destination: nil,
 		},
 	},
 }
 
-type IEClaims struct {
-	customClaims map[string]string
-	jwt.StandardClaims
-}
 
-type Token struct {
-	Raw       string                 // The raw token.  Populated when you Parse a token
-	Method    jwt.SigningMethod      // The signing method used or to be used
-	Header    map[string]interface{} // The first segment of the token
-	Claims    jwt.Claims             // The second segment of the token
-	Signature string                 // The third segment of the token.  Populated when you Parse a token
-	Valid     bool                   // Is the token valid?  Populated when you Parse/Verify a token
-}
 
 func callGenerateToken(c *cli.Context) error {
-	var signingKey = getPublicKey(c, c.String("name"), c.String("jurisdiction"))
-
-	var customClaims = map[string]string{
-		c.String("clientIdClaim"):   c.String("clientId"),
-		c.String("authGroupsClaim"): c.String("authGroups"),
+	params := jwtoken.JWTParams{
+		c.String("namespace"),
+		c.String("jurisdiction"),
+		c.String("clientId"),
+		c.String("clientIdClaim"),
+		c.String("authGroups"),
+		c.String("authGroupsClaim"),
 	}
-	claims := constructClaims(customClaims)
-	fmt.Println("JWT Token Claims:", customClaims)
-
-	token, err := createToken(claims, signingKey)
+	signingKey := jwtoken.GetPrivateKey(c, params)
+	token, err := jwtoken.CreateToken(params, signingKey)
 
 	if err != nil {
 		fmt.Errorf("Error generating token %v", err)
@@ -99,31 +93,4 @@ func callGenerateToken(c *cli.Context) error {
 	}
 
 	return nil
-}
-
-func getPublicKey(c *cli.Context, name string, jurisdiction string) []byte {
-	config, err := common.OpenConfig(c, name, jurisdiction)
-
-	fmt.Println(config, err)
-
-	return []byte("AllYourBase") // TODO: get the public key from config
-}
-
-func constructClaims(customClaims map[string]string) IEClaims {
-	return IEClaims{
-		customClaims,
-		jwt.StandardClaims{
-			ExpiresAt: 15000,
-		},
-	}
-}
-
-func createToken(claims IEClaims, signingKey []byte) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(signingKey)
-
-	if err != nil {
-		return "", errors.New("Error generating token!")
-	}
-	return ss, nil
 }

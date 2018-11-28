@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/urfave/cli"
+	"fmt"
+	akamai "github.com/akamai/cli-common-golang"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/urfave/cli"
 	"log"
 )
 
@@ -45,7 +47,7 @@ var commandPublish = cli.Command {
 		cli.StringFlag {
 			Name: "auth-groups",
 			Usage: "Optional authorized groups",
-			Value: "WebSockePSub",
+			Value: "WebSocketPub",
 		},
 		cli.StringFlag {
 			Name: "auth-groups-claim",
@@ -74,21 +76,25 @@ func callPublish(context *cli.Context) error {
 }
 
 func connectAndPublish(mqttParams MQTTParameters, topicName string, message string) error {
+	akamai.StartSpinner("Connecting to: "+mqttParams.host, "Done")
+
 	client, error := mqttParams.connectSSLClient()
 	if error != nil {
 		log.Fatalf("Unable to publish message. Host '%s' connection error: %s\n", mqttParams.host, error)
 		return error
 	}
 
-	log.Println("Publisher successfully connected to server:", mqttParams.host)
+	akamai.StopSpinnerOk()
+
+	akamai.StartSpinner(fmt.Sprint("Publishing message '", message, "' with QOS: ", mqttParams.qos, " to topic: ", topicName), "Done")
 
 	error = publishMessage(client, mqttParams, topicName, message)
 	if error != nil {
 		log.Fatalln("Unable to publish message, caused by:", error)
 		return error
 	}
-
-	log.Printf("Message '%s' sent to topic '%s' with qos: %d.\n", message, topicName, mqttParams.qos)
+	akamai.StopSpinnerOk()
+	//log.Printf("Message '%s' sent to topic '%s' with qos: %d.\n", message, topicName, mqttParams.qos)
 
 	return nil
 }

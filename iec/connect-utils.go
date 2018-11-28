@@ -3,6 +3,7 @@ package main
 import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/urfave/cli"
+    "github.com/bbucko/cli-iec/common/jwtoken"
 )
 
 type MQTTParameters struct {
@@ -15,6 +16,7 @@ type MQTTParameters struct {
 	token string
 	namespace string
 	jurisdiction string
+	keyName string
 }
 
 func (params MQTTParameters)connectWSSClient() (MQTT.Client, error) {
@@ -53,6 +55,7 @@ func buildMQTTParameters(context *cli.Context) MQTTParameters {
 	parameters.authGroupsClaim = context.String("auth-groups-claim")
 	parameters.namespace = context.String("namespace")
 	parameters.jurisdiction = context.String("jurisdiction")
+	parameters.keyName = context.String("key-name")
 
 	parameters.resolveAuthGroups()
 	parameters.resolveHost()
@@ -91,7 +94,7 @@ func (params *MQTTParameters) resolveHost()  {
 }
 
 func (params *MQTTParameters) resolveJWT() {
-	params.token = GenerateTokenLocal(params.buildJWTParameters())
+	params.token, _ = jwtoken.GenerateToken(params.keyName, params.buildJWTParameters())
 }
 
 type JWTParamsLocal struct {
@@ -103,30 +106,27 @@ type JWTParamsLocal struct {
 	authGroupsClaim string
 }
 
-func (mqttParams MQTTParameters) buildJWTParameters() JWTParamsLocal {
-	jwtParams := JWTParamsLocal{}
-
-	jwtParams.namespace = mqttParams.namespace
-	jwtParams.jurisdiction = mqttParams.jurisdiction
-	jwtParams.clientId = mqttParams.clientId
-	jwtParams.clientIdClaim = mqttParams.clientIdClaim
-	jwtParams.authGroups = mqttParams.authGroups
-	jwtParams.authGroupsClaim = mqttParams.authGroupsClaim
-
-	return jwtParams
+func (mqttParams MQTTParameters) buildJWTParameters() jwtoken.JWTParams {
+	return jwtoken.JWTParams{
+		mqttParams.namespace,
+		mqttParams.jurisdiction,
+		mqttParams.clientId,
+		mqttParams.clientIdClaim,
+		mqttParams.authGroups,
+		mqttParams.authGroupsClaim}
 }
 
-func GenerateTokenLocal(params JWTParamsLocal) (string) {
-	switch params.clientId + params.namespace {
-	case "HackathonPub" + "hackathon_dcp_test_com":
-		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblB1YiIsImdyb3VwcyI6IldlYlNvY2tldFB1YiIsImV4cCI6MTU0NjAxNzA1M30.1OqlwaF-4E7AuejIHrPKnmwjZ11G5qbaE8Rv7GZz1tp3IkFvxgF3tEkovNlnDJrCyXseUWUb7Ep8TAFYF34SZ8IlA7D1t78p8lhd7zN5ZGH73-6MYHzB_Vr_zg4pixmPS4uPlDrJxgPDzIdjIlAcbGsng8eVIpVOpibZ4BL05S2pdn5X2AxS3s3BB_niXWii13GQMvO0i_6dkOC2rjdmI14IK2i0zA9kEYkmxE_qFqi_UxKc8ns6CLWoq03O5gwlr-faJE6m-U3oaxgWseh6JbPowV7QKHIEg-odFRUgj0n9UMXnamA86h1MH1ldXClP_Q5MFgOp5hv0oeH5bZ0uZA"
-	case "HackathonSub"  + "hackathon_dcp_test_com":
-		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblN1YiIsImdyb3VwcyI6IldlYlNvY2tldFN1YiIsImV4cCI6MTU0NjAxNzA1M30.VGeSMWLZtyaAxuZojgeezLCVHmNjltihTFHBz99dQkW7vk4_PeQXamtEUtEVwsEG6zUelxa87WGibNqdOYIpxLhaU6mFAMnI0vuWERMEg6Ue5PmkaC1oV3lAaMgkWLimRt5fr5jECBTX6iVtagX5eoN_9MEjHWwLQjyuy4i3iRAb4SfN5IrZAgqxzx33Rr8c2vkfmJiTzmmU5lJLJlDM1cH3JG7FoYRY9bM3LH7Iis9ypyMvXj50WGL0NCrPiwSGgqcyTSJKYE4GaflAGGN7jx6XAlMIX4hBtFpUbfJLSn_1_Y-l0e0KfqTWawt_EBtgSXcZwPxeaUsV3-9Fh-IGMw"
-	case "HackathonPub" + "wiktor2_dcp_test_com":
-		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblB1YiIsImdyb3VwcyI6IldlYlNvY2tldFB1YiIsImV4cCI6MTU0NjAxMjAzOH0.Rt394Cfw4wUxKPyFyy-THm2iErzmkJo2s9cVd-QrwFI9c97BGBpOLHE9ZDfaponVDYbVmxflUtBcuFHVezV2hU6X5eQcUm4HifW_L4yl7Ubmgp_V0MtHC_K_cQQBcNjU4oxWwgkIQjk49f2vEIR60266HpbUysvZaapNRnlFoS2bROBs_ufHSC8Gqq7j2dH1D5lTB1EZ_zeIb19Qkct0cs9RoxRjc46-ZV7utEusLtn77prsOhj7uRXFzCaoIhWUpS7NtYnkCexXlc37_3xbng71u2veUxrXWwhbQnsemKXXlmCQm4GiwDZ5LH3jTR7uEhWAxBwAUo8Vf97F0NhVLg"
-	case "HackathonSub" + "wiktor2_dcp_test_com":
-		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblN1YiIsImdyb3VwcyI6IldlYlNvY2tldFN1YiIsImV4cCI6MTU0NjAxMjAzOH0.xzCvOegPWC4TVCMjZe7rvd8jqmKPdNUej12n2o0G1LhxaFJoStlPhahgG7wThCJ61FYzCE-5_xjYHzLkm2bgrbFDf8WsJfgiTTYWQK7eA-6Evuz6gYTTMPcMsAJlJBY3EqbmcI1m7HQSIfIDwC1C5MeY7srZu4xEEWX665dVjJE70aGlQnnWs0vu9NOsbzIhw57weDHZ0_ghy9VzGgWQuW7pfK0jnHq3cfGxJUJ4LNmLpQJFg6BuNsdfkSxJkMUAnZLDsySIcJEt-nEBdnO39U1m8pNtndtuT11mYr0yDykxryeZGFMT_UEYJ2LCwLDIMTSC20-jTg-c4cTWBH-LXg"
-	default:
-		return ""
-	}
-}
+//func GenerateTokenLocal(params JWTParamsLocal) (string) {
+//	switch params.clientId + params.namespace {
+//	case "HackathonPub" + "hackathon_dcp_test_com":
+//		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblB1YiIsImdyb3VwcyI6IldlYlNvY2tldFB1YiIsImV4cCI6MTU0NjAxNzA1M30.1OqlwaF-4E7AuejIHrPKnmwjZ11G5qbaE8Rv7GZz1tp3IkFvxgF3tEkovNlnDJrCyXseUWUb7Ep8TAFYF34SZ8IlA7D1t78p8lhd7zN5ZGH73-6MYHzB_Vr_zg4pixmPS4uPlDrJxgPDzIdjIlAcbGsng8eVIpVOpibZ4BL05S2pdn5X2AxS3s3BB_niXWii13GQMvO0i_6dkOC2rjdmI14IK2i0zA9kEYkmxE_qFqi_UxKc8ns6CLWoq03O5gwlr-faJE6m-U3oaxgWseh6JbPowV7QKHIEg-odFRUgj0n9UMXnamA86h1MH1ldXClP_Q5MFgOp5hv0oeH5bZ0uZA"
+//	case "HackathonSub"  + "hackathon_dcp_test_com":
+//		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblN1YiIsImdyb3VwcyI6IldlYlNvY2tldFN1YiIsImV4cCI6MTU0NjAxNzA1M30.VGeSMWLZtyaAxuZojgeezLCVHmNjltihTFHBz99dQkW7vk4_PeQXamtEUtEVwsEG6zUelxa87WGibNqdOYIpxLhaU6mFAMnI0vuWERMEg6Ue5PmkaC1oV3lAaMgkWLimRt5fr5jECBTX6iVtagX5eoN_9MEjHWwLQjyuy4i3iRAb4SfN5IrZAgqxzx33Rr8c2vkfmJiTzmmU5lJLJlDM1cH3JG7FoYRY9bM3LH7Iis9ypyMvXj50WGL0NCrPiwSGgqcyTSJKYE4GaflAGGN7jx6XAlMIX4hBtFpUbfJLSn_1_Y-l0e0KfqTWawt_EBtgSXcZwPxeaUsV3-9Fh-IGMw"
+//	case "HackathonPub" + "wiktor2_dcp_test_com":
+//		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblB1YiIsImdyb3VwcyI6IldlYlNvY2tldFB1YiIsImV4cCI6MTU0NjAxMjAzOH0.Rt394Cfw4wUxKPyFyy-THm2iErzmkJo2s9cVd-QrwFI9c97BGBpOLHE9ZDfaponVDYbVmxflUtBcuFHVezV2hU6X5eQcUm4HifW_L4yl7Ubmgp_V0MtHC_K_cQQBcNjU4oxWwgkIQjk49f2vEIR60266HpbUysvZaapNRnlFoS2bROBs_ufHSC8Gqq7j2dH1D5lTB1EZ_zeIb19Qkct0cs9RoxRjc46-ZV7utEusLtn77prsOhj7uRXFzCaoIhWUpS7NtYnkCexXlc37_3xbng71u2veUxrXWwhbQnsemKXXlmCQm4GiwDZ5LH3jTR7uEhWAxBwAUo8Vf97F0NhVLg"
+//	case "HackathonSub" + "wiktor2_dcp_test_com":
+//		return "eyJhbGciOiJSUzI1NiJ9.eyJjbGllbnRJZCI6IkhhY2thdGhvblN1YiIsImdyb3VwcyI6IldlYlNvY2tldFN1YiIsImV4cCI6MTU0NjAxMjAzOH0.xzCvOegPWC4TVCMjZe7rvd8jqmKPdNUej12n2o0G1LhxaFJoStlPhahgG7wThCJ61FYzCE-5_xjYHzLkm2bgrbFDf8WsJfgiTTYWQK7eA-6Evuz6gYTTMPcMsAJlJBY3EqbmcI1m7HQSIfIDwC1C5MeY7srZu4xEEWX665dVjJE70aGlQnnWs0vu9NOsbzIhw57weDHZ0_ghy9VzGgWQuW7pfK0jnHq3cfGxJUJ4LNmLpQJFg6BuNsdfkSxJkMUAnZLDsySIcJEt-nEBdnO39U1m8pNtndtuT11mYr0yDykxryeZGFMT_UEYJ2LCwLDIMTSC20-jTg-c4cTWBH-LXg"
+//	default:
+//		return ""
+//	}
+//}

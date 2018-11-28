@@ -6,11 +6,9 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/bbucko/cli-iec/common/ini-repo"
 	"log"
 )
-
-// FIXME: remove and use ini file implementation
-var keysRepository = make(map[string]RSAKey)
 
 type RSAKey struct {
 	KeyName    string
@@ -18,9 +16,19 @@ type RSAKey struct {
 	PublicKey  string
 }
 
-func FetchRSAKeyByName(name string) (RSAKey, error) {
+func FetchRSAKeyByName(name string) (key RSAKey, err error) {
 	log.Printf("Searching repository for RSA key with name: [%v]", name)
-	return keysRepository[name], nil
+	privateKey, err := ini_repo.GetValue("keys", fmt.Sprintf("%v_private", name))
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	publicKey, err := ini_repo.GetValue("keys", fmt.Sprintf("%v_public", name))
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	return RSAKey{name, privateKey, publicKey}, nil
 }
 
 func CreateRSAKey(name string, bits int) (RSAKey, error) {
@@ -43,7 +51,8 @@ func CreateRSAKey(name string, bits int) (RSAKey, error) {
 
 func (key RSAKey) Persist() {
 	log.Printf("Saving RSA key: %v", key)
-	keysRepository[key.KeyName] = key
+	ini_repo.Persist("keys", key.PublicKeySectionName(), key.PublicKey)
+	ini_repo.Persist("keys", key.PrivateKeySectionName(), key.PrivateKey)
 }
 
 func (key RSAKey) PublicKeySectionName() string {
