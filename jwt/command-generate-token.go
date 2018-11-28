@@ -3,7 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/akamai/cli-iec/common"
+	"github.com/bbucko/cli-iec/.vendor-new/github.com/dgrijalva/jwt-go"
+	"github.com/bbucko/cli-iec/common"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/urfave/cli"
 )
