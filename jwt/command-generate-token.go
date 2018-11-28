@@ -3,17 +3,67 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/akamai/cli-iec/common"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/urfave/cli"
 )
 
-var commandGenerateToken = cli.Command{
+var commandGenerateToken cli.Command = cli.Command{
 	Name:        "token",
-	ArgsUsage:   "",
+	ArgsUsage:   "[name] [jurisdiction]",
 	Description: "",
 	HideHelp:    true,
 	Action:      callGenerateToken,
-	Flags:       []cli.Flag{},
+	Flags:       []cli.Flag{
+		cli.StringFlag{
+			Name:        "name",
+			Usage:       "Namespace name",
+			EnvVar:      "",
+			Hidden:      false,
+			Value:       "",
+			Destination: nil,
+		},
+		cli.StringFlag{
+			Name:        "jurisdiction",
+			Usage:       "Namespace jurisdiction",
+			EnvVar:      "",
+			Hidden:      true,
+			Value:       "na",
+			Destination: nil,
+		},
+		cli.StringFlag{
+			Name:        "clientId",
+			Usage:       "Client id",
+			EnvVar:      "",
+			Hidden:      false,
+			Value:       "",
+			Destination: nil,
+		},
+		cli.StringFlag{
+			Name:        "clientIdClaim",
+			Usage:       "Client id claim",
+			EnvVar:      "",
+			Hidden:      true,
+			Value:       "client-id",
+			Destination: nil,
+		},
+		cli.StringFlag{
+			Name:        "authGroups",
+			Usage:       "Auth groups",
+			EnvVar:      "",
+			Hidden:      false,
+			Value:       "",
+			Destination: nil,
+		},
+		cli.StringFlag{
+			Name:        "authGroupsClaim",
+			Usage:       "Auth groups claim",
+			EnvVar:      "",
+			Hidden:      true,
+			Value:       "auth-groups",
+			Destination: nil,
+		},
+	},
 }
 
 type IEClaims struct {
@@ -31,13 +81,15 @@ type Token struct {
 }
 
 func callGenerateToken(c *cli.Context) error {
-	var signingKey = []byte("AllYourBase") // TODO get from file? stdout?
+	var signingKey = getPublicKey(c, c.String("name"), c.String("jurisdiction"))
 
-	var customClaims = map[string]string{ // TODO get from context
-		"clientId":   "username",
-		"authGroups": "testGroup",
+	var customClaims = map[string]string{
+		c.String("clientIdClaim"):   c.String("clientId"),
+		c.String("authGroupsClaim"): c.String("authGroups"),
 	}
 	claims := constructClaims(customClaims)
+	fmt.Println("JWT Token Claims:", customClaims)
+
 	token, err := createToken(claims, signingKey)
 
 	if err != nil {
@@ -47,6 +99,14 @@ func callGenerateToken(c *cli.Context) error {
 	}
 
 	return nil
+}
+
+func getPublicKey(c *cli.Context, name string, jurisdiction string) []byte {
+	config, err := common.OpenConfig(c, name, jurisdiction)
+
+	fmt.Println(config, err)
+
+	return []byte("AllYourBase") // TODO: get the public key from config
 }
 
 func constructClaims(customClaims map[string]string) IEClaims {

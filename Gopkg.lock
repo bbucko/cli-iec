@@ -18,6 +18,17 @@
   revision = "31d6ebdd75c771ffbc5136f649ad6d0930bad42b"
 
 [[projects]]
+  branch = "master"
+  digest = "1:a172d388d37d0b29cea2a10c61eab463c82ec4a7499e68e58311d713fde386af"
+  name = "github.com/bbucko/cli-iec"
+  packages = [
+    "common",
+    "keys",
+  ]
+  pruneopts = "UT"
+  revision = "11bc277ce35470865829d8bba6865d3a3263b3f1"
+
+[[projects]]
   digest = "1:2fd83c8c2b1ff53fd7c4376a63c3a2f31e002e9296df9d7f150b07da524de88d"
   name = "github.com/briandowns/spinner"
   packages = ["."]
@@ -129,6 +140,8 @@
   analyzer-version = 1
   input-imports = [
     "github.com/akamai/cli-common-golang",
+    "github.com/bbucko/cli-iec/common",
+    "github.com/bbucko/cli-iec/keys",
     "github.com/dgrijalva/jwt-go",
     "github.com/go-ini/ini",
     "github.com/mitchellh/go-homedir",
