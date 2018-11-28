@@ -9,7 +9,7 @@ import (
 
 var commandSubscribe = cli.Command{
 	Name:        "subscribe",
-	ArgsUsage:   "[qos][host][client-id][key-name][topic]",
+	ArgsUsage:   "[qos][namespace][jurisdiction][host][client-id][key-name][topic]",
 	Description: "Subscribes to a topic and waits for a messages published to this topic.",
 	HideHelp:    true,
 	Action:      callSubscribe,
@@ -20,14 +20,38 @@ var commandSubscribe = cli.Command{
 			Value: 0,
 		},
 		cli.StringFlag {
+			Name: "namespace",
+			Usage: "Namespace assigned of the property.",
+			Value: "test",
+		},
+		cli.StringFlag {
+			Name: "jurisdiction",
+			Usage: "Jurisdiction assigned of the property.",
+			Value: "eu",
+		},
+		cli.StringFlag {
 			Name: "host",
-			Usage: "Url to host",
-			Value: "qa4.dcp-test.com",
+			Usage: "Optional url to host. If not specified hostname will be retrieved from configuration using namespace/jurisdiction",
 		},
 		cli.StringFlag {
 			Name: "client-id",
 			Usage: "Client id",
+			Value: "HackathonSub",
+		},
+		cli.StringFlag {
+			Name: "client-id-claim",
+			Usage: "Client id claim name",
+			Value: "clientId",
+		},
+		cli.StringFlag {
+			Name: "auth-groups",
+			Usage: "Authorized groups",
 			Value: "WebSocketSub",
+		},
+		cli.StringFlag {
+			Name: "auth-groups-claim",
+			Usage: "Authorized groups claim name",
+			Value: "groups",
 		},
 		cli.StringFlag {
 			Name: "key-name",
@@ -42,19 +66,13 @@ var commandSubscribe = cli.Command{
 }
 
 func callSubscribe(context *cli.Context) error {
-	mqttParams := MqttParameters{}
-	mqttParams.qos = byte(context.Int("qos"))
-	mqttParams.host = context.String("host")
-	mqttParams.clientId = context.String("client-id")
-	mqttParams.token = getSubscribersJWT(context.String("key-name"))
-
-	return connectAndSubscribe(mqttParams, context.String("topic"))
+	return connectAndSubscribe(buildMQTTParameters(context), context.String("topic"))
 }
 
-func connectAndSubscribe(mqttParams MqttParameters, topicName string) error {
+func connectAndSubscribe(mqttParams MQTTParameters, topicName string) error {
 	client, error := mqttParams.connectSSLClient()
 	if error != nil {
-		log.Fatalln("Unable to publish message, caused by connection error:", error)
+		log.Fatalf("Unable to subscribe to topic. Host '%s' connection error: %s\n", mqttParams.host, error)
 		return error
 	}
 
@@ -73,7 +91,7 @@ func connectAndSubscribe(mqttParams MqttParameters, topicName string) error {
 	return nil
 }
 
-func subscribeToTopic(client MQTT.Client, mqttParams MqttParameters, topicName string) error {
+func subscribeToTopic(client MQTT.Client, mqttParams MQTTParameters, topicName string) error {
 	token := client.Subscribe(topicName, mqttParams.qos, onMessage)
 	token.Wait()
 	return token.Error()

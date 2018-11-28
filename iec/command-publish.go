@@ -8,7 +8,7 @@ import (
 
 var commandPublish = cli.Command {
 	Name:        "publish",
-	ArgsUsage:   "[qos][host][client-id][key-name][topic][message]",
+	ArgsUsage:   "[qos][namespace][jurisdiction][host][client-id][key-name][topic][message]",
 	Description: "Publishes message to the topic",
 	HideHelp:    true,
 	Action:      callPublish,
@@ -19,15 +19,39 @@ var commandPublish = cli.Command {
 			Value: 0,
 		},
 		cli.StringFlag {
+			Name: "namespace",
+			Usage: "Namespace assigned of the property.",
+			Value: "test",
+		},
+		cli.StringFlag {
+			Name: "jurisdiction",
+			Usage: "Jurisdiction assigned of the property.",
+			Value: "eu",
+		},
+		cli.StringFlag {
 			Name: "host",
-			Usage: "Url to host",
-			Value: "qa4.dcp-test.com",
+			Usage: "Optional url to host. If not specified hostname will be retrieved from configuration using namespace/jurisdiction",
         },
 		cli.StringFlag {
 			Name: "client-id",
 			Usage: "Client id",
-			Value: "WebSocketPub",
+			Value: "HackathonPub",
         },
+		cli.StringFlag {
+			Name: "client-id-claim",
+			Usage: "Optional client id claim name",
+			Value: "clientId",
+		},
+		cli.StringFlag {
+			Name: "auth-groups",
+			Usage: "Optional authorized groups",
+			Value: "WebSockePSub",
+		},
+		cli.StringFlag {
+			Name: "auth-groups-claim",
+			Usage: "Optional authorized groups claim name",
+			Value: "groups",
+		},
 		cli.StringFlag {
 			Name: "key-name",
 			Usage: "Name of the generated key",
@@ -46,20 +70,13 @@ var commandPublish = cli.Command {
 }
 
 func callPublish(context *cli.Context) error {
-	parameters := MqttParameters{}
-	parameters.qos = byte(context.Int("qos"))
-	parameters.host = context.String("host")
-	parameters.clientId = context.String("client-id")
-	parameters.token = getPublishersJWT(context.String("key-name"))
-
-	return connectAndPublish(parameters, context.String("topic"), context.String("message"))
+	return connectAndPublish(buildMQTTParameters(context), context.String("topic"), context.String("message"))
 }
 
-func connectAndPublish(mqttParams MqttParameters, topicName string, message string) error {
-
+func connectAndPublish(mqttParams MQTTParameters, topicName string, message string) error {
 	client, error := mqttParams.connectSSLClient()
 	if error != nil {
-		log.Fatalln("Unable to publish message, caused by connection error:", error)
+		log.Fatalf("Unable to publish message. Host '%s' connection error: %s\n", mqttParams.host, error)
 		return error
 	}
 
@@ -76,7 +93,7 @@ func connectAndPublish(mqttParams MqttParameters, topicName string, message stri
 	return nil
 }
 
-func publishMessage(client MQTT.Client, mqttParams MqttParameters, topicName string, message string) error {
+func publishMessage(client MQTT.Client, mqttParams MQTTParameters, topicName string, message string) error {
 	token := client.Publish(topicName, mqttParams.qos, false, message)
 	token.Wait()
 	return token.Error()
