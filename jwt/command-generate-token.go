@@ -10,7 +10,7 @@ import (
 
 var commandGenerateToken cli.Command = cli.Command{
 	Name:        "token",
-	ArgsUsage:   "[name] [jurisdiction]",
+	ArgsUsage:   "[name] [jurisdiction] [clientId] [clientIdClaim] [authGroups] [authGroupsClaim]",
 	Description: "",
 	HideHelp:    true,
 	Action:      callGenerateToken,
@@ -44,7 +44,7 @@ var commandGenerateToken cli.Command = cli.Command{
 			Usage:       "Client id claim",
 			EnvVar:      "",
 			Hidden:      true,
-			Value:       "client-id",
+			Value:       "clientId",
 			Destination: nil,
 		},
 		cli.StringFlag{
@@ -60,11 +60,13 @@ var commandGenerateToken cli.Command = cli.Command{
 			Usage:       "Auth groups claim",
 			EnvVar:      "",
 			Hidden:      true,
-			Value:       "auth-groups",
+			Value:       "authGroup",
 			Destination: nil,
 		},
 	},
 }
+
+var BearerToken string
 
 type IEClaims struct {
 	customClaims map[string]string
@@ -88,25 +90,24 @@ func callGenerateToken(c *cli.Context) error {
 		c.String("authGroupsClaim"): c.String("authGroups"),
 	}
 	claims := constructClaims(customClaims)
-	fmt.Println("JWT Token Claims:", customClaims)
-
 	token, err := createToken(claims, signingKey)
 
 	if err != nil {
 		fmt.Errorf("Error generating token %v", err)
 	} else {
 		fmt.Println("JWT Token:", token)
+		BearerToken = token // mem persist
 	}
 
 	return nil
 }
 
 func getPublicKey(c *cli.Context, name string, jurisdiction string) []byte {
-	config, err := common.OpenConfig(c, name, jurisdiction)
+	var config, err = common.OpenConfig(c, name, jurisdiction)
+	var privateKey = config.JwtConfig.Key().PrivateKey
 
-	fmt.Println(config, err)
-
-	return []byte("AllYourBase") // TODO: get the public key from config
+	fmt.Println("Private Key:", privateKey, err)
+	return []byte(privateKey)
 }
 
 func constructClaims(customClaims map[string]string) IEClaims {
