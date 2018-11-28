@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/akamai/cli-iec/common/keys"
 	"github.com/bbucko/cli-iec/common"
+	"github.com/bbucko/cli-iec/common/keys"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/urfave/cli"
 )
@@ -76,8 +76,8 @@ var commandGenerateToken = cli.Command{
 }
 
 type IEClaims struct {
-	ClientId  string `json:"clientId"`
-	AuthGroups string  `json:"groups"`
+	ClientId   string `json:"clientId"`
+	AuthGroups string `json:"groups"`
 	jwt.StandardClaims
 }
 
@@ -91,11 +91,11 @@ type Token struct {
 }
 
 type JWTParams struct {
-	namespace string
-	jurisdiction string
-	clientId string
-	clientIdClaim string
-	authGroups string
+	namespace       string
+	jurisdiction    string
+	clientId        string
+	clientIdClaim   string
+	authGroups      string
 	authGroupsClaim string
 }
 
