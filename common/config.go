@@ -1,8 +1,8 @@
 package common
 
 import (
+	"github.com/bbucko/cli-iec/common/ini-repo"
 	"github.com/bbucko/cli-iec/common/keys"
-	"github.com/bbucko/cli-iec/ini-repo"
 	"github.com/go-ini/ini"
 	"github.com/urfave/cli"
 	"strings"

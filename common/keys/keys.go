@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/bbucko/cli-iec/ini-repo"
+	"github.com/bbucko/cli-iec/common/ini-repo"
 	"log"
 )
 
