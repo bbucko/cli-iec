@@ -8,61 +8,79 @@ import (
 	"log"
 )
 
-var commandPublish = cli.Command{
+var commandPublish = cli.Command {
 	Name:        "publish",
-	ArgsUsage:   "[qos][host][client-id][key-name][topic][message]",
+	ArgsUsage:   "[qos][namespace][jurisdiction][host][client-id][key-name][topic][message]",
 	Description: "Publishes message to the topic",
 	HideHelp:    true,
 	Action:      callPublish,
-	Flags: []cli.Flag{
-		cli.IntFlag{
-			Name:  "qos",
+	Flags:       []cli.Flag {
+		cli.IntFlag {
+			Name: "qos",
 			Usage: "qos - Quality of service. Allowed values 0, 1, 2.",
 			Value: 0,
 		},
-		cli.StringFlag{
-			Name:  "host",
-			Usage: "Url to host",
-			Value: "qa4.dcp-test.com",
-		},
-		cli.StringFlag{
-			Name:  "client-id",
-			Usage: "Client id",
-			Value: "WebSocketPub",
-		},
-		cli.StringFlag{
-			Name:  "key-name",
-			Usage: "Name of the generated key",
-		},
-		cli.StringFlag{
-			Name:  "topic",
-			Usage: "Name of the topic to which message will be published",
+		cli.StringFlag {
+			Name: "namespace",
+			Usage: "Namespace assigned of the property.",
 			Value: "test",
 		},
-		cli.StringFlag{
-			Name:  "message",
+		cli.StringFlag {
+			Name: "jurisdiction",
+			Usage: "Jurisdiction assigned of the property.",
+			Value: "eu",
+		},
+		cli.StringFlag {
+			Name: "host",
+			Usage: "Optional url to host. If not specified hostname will be retrieved from configuration using namespace/jurisdiction",
+        },
+		cli.StringFlag {
+			Name: "client-id",
+			Usage: "Client id",
+			Value: "HackathonPub",
+        },
+		cli.StringFlag {
+			Name: "client-id-claim",
+			Usage: "Optional client id claim name",
+			Value: "clientId",
+		},
+		cli.StringFlag {
+			Name: "auth-groups",
+			Usage: "Optional authorized groups",
+			Value: "WebSocketPub",
+		},
+		cli.StringFlag {
+			Name: "auth-groups-claim",
+			Usage: "Optional authorized groups claim name",
+			Value: "groups",
+		},
+		cli.StringFlag {
+			Name: "key-name",
+			Usage: "Name of the generated key",
+        },
+		cli.StringFlag {
+			Name: "topic",
+			Usage: "Name of the topic to which message will be published",
+			Value: "test",
+        },
+		cli.StringFlag {
+			Name: "message",
 			Usage: "Message to be published",
 			Value: "Hello Akamai",
-		},
-	},
+        },
+    },
 }
 
 func callPublish(context *cli.Context) error {
-	parameters := MqttParameters{}
-	parameters.qos = byte(context.Int("qos"))
-	parameters.host = context.String("host")
-	parameters.clientId = context.String("client-id")
-	parameters.token = getPublishersJWT(context.String("key-name"))
-
-	return connectAndPublish(parameters, context.String("topic"), context.String("message"))
+	return connectAndPublish(buildMQTTParameters(context), context.String("topic"), context.String("message"))
 }
 
-func connectAndPublish(mqttParams MqttParameters, topicName string, message string) error {
+func connectAndPublish(mqttParams MQTTParameters, topicName string, message string) error {
 	akamai.StartSpinner("Connecting to: "+mqttParams.host, "Done")
 
 	client, error := mqttParams.connectSSLClient()
 	if error != nil {
-		log.Fatalln("Unable to publish message, caused by connection error:", error)
+		log.Fatalf("Unable to publish message. Host '%s' connection error: %s\n", mqttParams.host, error)
 		return error
 	}
 
@@ -81,7 +99,7 @@ func connectAndPublish(mqttParams MqttParameters, topicName string, message stri
 	return nil
 }
 
-func publishMessage(client MQTT.Client, mqttParams MqttParameters, topicName string, message string) error {
+func publishMessage(client MQTT.Client, mqttParams MQTTParameters, topicName string, message string) error {
 	token := client.Publish(topicName, mqttParams.qos, false, message)
 	token.Wait()
 	return token.Error()
