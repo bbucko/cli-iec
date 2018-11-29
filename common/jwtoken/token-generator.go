@@ -1,20 +1,14 @@
 package jwtoken
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"github.com/bbucko/cli-iec/common/keys"
-	"github.com/urfave/cli"
-	"github.com/bbucko/cli-iec/common"
-	"fmt"
 	"errors"
+	"fmt"
+	"github.com/bbucko/cli-iec/common"
+	"github.com/bbucko/cli-iec/common/keys"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/urfave/cli"
 	"log"
 )
-
-type IEClaims struct {
-	ClientId   string `json:"clientId"`
-	AuthGroups string `json:"groups"`
-	jwt.StandardClaims
-}
 
 type Token struct {
 	Raw       string                 // The raw token.  Populated when you Parse a token
@@ -59,15 +53,10 @@ func constructClaims(params JWTParams) jwt.Claims {
 		params.ClientIdClaim:   params.ClientId,
 		params.AuthGroupsClaim: params.AuthGroups,
 	}
-	fmt.Printf("%v\n", customClaims[params.ClientIdClaim])
-	customClaims[params.ClientIdClaim] = params.ClientId
+	//fmt.Printf("%v\n", customClaims[params.ClientIdClaim])
+	//customClaims[params.ClientIdClaim] = params.ClientId
 
-	return IEClaims{
-		params.ClientId,
-		params.AuthGroups,
-		jwt.StandardClaims{
-		},
-	}
+	return customClaims
 }
 
 func CreateToken(params JWTParams, signBytes []byte) (string, error) {

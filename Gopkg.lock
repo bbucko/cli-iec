@@ -138,14 +138,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f343f077a5b0bc3a3788b3a04e24dd417e3e25b2acb529c413e212d2c42416ef"
+  digest = "1:0c7cb58af944f9690af91474a75371eecfe54c1ce3771a8dc08924430ee785d3"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "62eef0e2fa9b2c385f7b2778e763486da6880d37"
+  revision = "4ed8d59d0b35e1e29334a206d1b3f38b1e5dfb31"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -154,6 +154,7 @@
     "github.com/akamai/cli-common-golang",
     "github.com/dgrijalva/jwt-go",
     "github.com/eclipse/paho.mqtt.golang",
+    "github.com/fatih/color",
     "github.com/go-ini/ini",
     "github.com/google/uuid",
     "github.com/mitchellh/go-homedir",
